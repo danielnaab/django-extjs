@@ -100,7 +100,7 @@ Ext.ux.AutoEditableGrid = Ext.extend(Ext.ux.AutoGrid, {
                                callback : function(options, success, response) {
                                     json  = Ext.decode(response.responseText);
                                     if (!success || !json.success) {
-                                        alert("Erreur : " + json.msg);
+                                        alert("Error: " + json.msg);
                                     }
                                     else{
                                         

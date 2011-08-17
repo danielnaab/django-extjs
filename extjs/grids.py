@@ -36,12 +36,12 @@ class VirtualField(object):
         
 class ModelGrid(object):
 
-    def __init__(self, model):
+    def __init__(self, model, model_fields=None):
         self.model = model      # the model to use as reference
         self.fields = []        # holds the extjs fields
         self.base_fields = []   # holds the base model fields
         
-        model_fields = self.model._meta._fields()
+        model_fields = model_fields or self.model._meta._fields()
         excludes = getattr(self.Meta, 'exclude', [])
         # reorder cols if needed
         order = getattr(self.Meta, 'order', None)

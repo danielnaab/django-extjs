@@ -18,8 +18,8 @@ Ext.ux.AutoGrid = Ext.extend(Ext.ux.AutoGridPanel, {
                 pageSize: this.pagesize,
                 store:  this.store,
                 displayInfo: true,
-                displayMsg: '{0} à {1} sur {2}',
-                emptyMsg: "Aucun élément à afficher"
+                displayMsg: '{0} to {1} of {2}',
+                emptyMsg: 'No items to display'
         });
         
         var config = {  

@@ -12,7 +12,7 @@
                 ,custom_config:null
                 ,default_config:null
                 ,showButtons:true
-                ,showSuccessMessage:'Formulaire bien enregistre'
+                ,showSuccessMessage:'Form good records'
                 
                 ,initComponent:function() {
                     if (this.showButtons) {
@@ -103,8 +103,8 @@
                 
                         this.fireEvent('submitError', msg);
                         Ext.Msg.show({
-                               title:'Erreur',
-                               msg: 'Impossible de valider : <br>' + msg + '<br>',
+                               title:'Error',
+                               msg: 'Unable to validate: <br>' + msg + '<br>',
                                buttons: Ext.Msg.OK,               
                                icon: Ext.MessageBox.WARNING 
                             });
@@ -127,8 +127,8 @@
                 ,invalid:function() {
                 //    console.log('invalid: ', this.getForm().getValues());
                      Ext.Msg.show({
-                       title:'Erreur',
-                       msg: 'Impossible de valider : formulaire invalide',
+                       title:'Error',
+                       msg: 'Unable to validate: form disabled',
                        buttons: Ext.Msg.OK,               
                        icon: Ext.MessageBox.WARNING 
                     });
