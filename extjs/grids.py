@@ -1,4 +1,4 @@
- 
+
 import utils
 
 import forms
@@ -8,7 +8,7 @@ import forms
 
 class SimpleGrid(object):
     def to_grid(self, fields, rows, totalcount = None, json_add = {}, sort_field = 'id', sort_direction = 'DESC'):
-        if not totalcount: 
+        if not totalcount:
             totalcount = len(rows)
         jdict = {
             'success':True
@@ -26,21 +26,21 @@ class SimpleGrid(object):
                 ,'totalCount':totalcount
             }
         return utils.JSONserialise(jdict)
-         
+
 
 class VirtualField(object):
     def __init__(self, name):
         self.name = name
 
 
-        
+
 class ModelGrid(object):
 
     def __init__(self, model, model_fields=None):
         self.model = model      # the model to use as reference
         self.fields = []        # holds the extjs fields
         self.base_fields = []   # holds the base model fields
-        
+
         model_fields = model_fields or self.model._meta._fields()
         excludes = getattr(self.Meta, 'exclude', [])
         # reorder cols if needed
@@ -56,8 +56,8 @@ class ModelGrid(object):
                     self.base_fields.append(VirtualField(field))
         else:
             self.base_fields = model_fields
-            
-        
+
+
         for field in self.base_fields:
             if field.name in excludes:
                 continue
@@ -65,22 +65,22 @@ class ModelGrid(object):
                 self.fields.append(self.Meta.fields_conf[field.name])
                 continue
             fdict = {'name':field.name, 'header': field.name}
-            
+
             if getattr(field, 'verbose_name', None) and field.verbose_name != field.name:
                 fdict['tooltip'] = u'%s' %  field.verbose_name
-            
+
             if field.name == 'id':
                 fdict['id']='id'
             if  field.__class__.__name__ == 'DateTimeField':
                 fdict['type'] = 'datetime'
-                fdict['xtype'] = 'datecolumn' 
+                fdict['xtype'] = 'datecolumn'
                 fdict['dateFormat'] = 'Y-m-d H:i:s'
                 fdict['format'] = 'Y-m-d H:i:s'
 
                 #fdict['editor'] = "new Ext.ux.form.DateTime({hiddenFormat:'Y-m-d H:i', dateFormat:'Y-m-D', timeFormat:'H:i'})"
             if  field.__class__.__name__ == 'DateField':
                 fdict['type'] = 'date'
-                fdict['xtype'] = 'datecolumn' 
+                fdict['xtype'] = 'datecolumn'
                 fdict['dateFormat'] = 'Y-m-d'
                 fdict['format'] = 'Y-m-d'
                 #fdict['renderer'] = 'Ext.util.'
@@ -107,23 +107,23 @@ class ModelGrid(object):
                 fdict['renderer'] = 'function(v) {a = %s; return a[v] || "";}' % utils.JSONserialise(a)
             if getattr(self.Meta, 'fields_conf', {}).has_key(field.name):
                 fdict.update(self.Meta.fields_conf[field.name])
-                
+
                # print fdict
             self.fields.append(fdict)
         #for field in self.model:
         #    print field
-    
-    def get_field(self, name):  
+
+    def get_field(self, name):
         for f in self.fields:
             if f.get('name') == name:
                 return f
         return None
-    def get_base_field(self, name):  
+    def get_base_field(self, name):
         for f in self.base_fields:
             if f.name == name:
                 return f
         return None
-    def get_fields(self, colModel):  
+    def get_fields(self, colModel):
         """ return this grid field list
             . can include hidden fields
             . A given colModel can order the fields and override width/hidden properties
@@ -133,23 +133,23 @@ class ModelGrid(object):
         # use the given colModel to order the fields
         if colModel and colModel.get('fields'):
             fields = []
-            for f in colModel['fields']:    
+            for f in colModel['fields']:
                 for cf in self.fields:
                     if cf['name'] == f['name']:
                         config_field = cf
                         if f.get('width'):
                             config_field['width'] = f.get('width')
                         # force hidden=False if field present in given colModel
-                        if f.get('hidden') == True:                        
+                        if f.get('hidden') == True:
                             config_field['hidden'] = True
                         else:
                             config_field['hidden'] = False
                         fields.append(config_field)
         return fields
-                        
+
     def get_rows(self, fields, queryset, start, limit):
-        """ 
-            return the row list from given queryset 
+        """
+            return the row list from given queryset
             order the data based on given field list
             paging from start,limit
         """
@@ -186,24 +186,24 @@ class ModelGrid(object):
             #json += ']\n'
 
         return rows
-         
-        
+
+
     def to_grid(self, queryset, start = 0, limit = 0, totalcount = None, json_add = {}, colModel = None, sort_field = 'id', sort_direction = 'DESC'):
         """ return the given queryset as an ExtJs grid config
             includes full metadata (columns, renderers, totalcount...)
             includes the rows data
-            to be used in combination with Ext.ux.AutoGrid 
+            to be used in combination with Ext.ux.AutoGrid
         """
-        if not totalcount: 
+        if not totalcount:
             totalcount = queryset.count()
 
         base_fields = self.get_fields(colModel)
-        
+
         # todo : stupid ?
         id_field = base_fields[0]['name']
-            
+
         jsondict = {
-             'succes':True
+             'success':True
             ,'metaData':{
                  'root':'rows'
                 ,'totalProperty':'totalCount'
@@ -218,12 +218,12 @@ class ModelGrid(object):
             ,'rows':self.get_rows(base_fields, queryset, start, limit)
             ,'totalCount':totalcount
         }
-        
+
         if json_add:
             jsondict.update(json_add)
-        
-        return utils.JSONserialise(jsondict) 
-        
+
+        return utils.JSONserialise(jsondict)
+
     class Meta:
         exclude = []
         order = []
@@ -241,7 +241,7 @@ class EditableModelGrid(ModelGrid):
             if field_conf and not (getattr(self.Meta, 'fields_conf', {}).has_key(field.name) and self.Meta.fields_conf[field.name].has_key('editor')):
                 field_conf['editor'] = forms.getFieldConfig(field.name, field)
                 #print 'getFieldConfig editor', field.name, field_conf['editor']
-                
+
     def update_instances_from_json(self, json, insert_new = True):
         """ udpate this grid model instances from provided json
             json example : update=[{"id":1, "username":"root2","first_name":"", "last_name":"bouqui", "is_staff":false, "is_superuser":true}]
@@ -249,7 +249,7 @@ class EditableModelGrid(ModelGrid):
         """
         from django.utils import simplejson
         items = simplejson.loads(json)
-        
+
         forms_items = []
         forms_valid = True
         errors = []
@@ -279,10 +279,9 @@ class EditableModelGrid(ModelGrid):
                 errors.append(form.errors)
 
         if not errors:
-            for form in forms_items:             
+            for form in forms_items:
                 form.save()
             return True
         else:
             # todo : detailed errors
             raise Exception(errors)
-                
